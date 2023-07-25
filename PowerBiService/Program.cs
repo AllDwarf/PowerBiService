@@ -6,6 +6,8 @@ using Microsoft.Extensions.Options;
 using Azure.Security.KeyVault.Secrets;
 using Azure.Identity;
 using Microsoft.AspNetCore.DataProtection;
+using System.CommandLine;
+using System.CommandLine.Invocation;
 
 // Use appsettings.json to get new variables clientId, tenantId, username, password
 // Use the following code to get a token
@@ -21,6 +23,19 @@ var config = new ConfigurationBuilder()
 var azureAd = new AzureAd();
 config.Bind("AzureAd", azureAd);
 IOptions<AzureAd> azureAdOption = Options.Create(azureAd);
+
+//// Bind command line options to the configuration
+//var reportId = new Option<string>(
+//            name: "--reportId",
+//            description: "Report ID to perform BlueGreen deployment on",
+//            getDefaultValue: () => config["ReportId"]);
+
+//var workspaceName = new Option<string>(
+//            name: "--workspaceName",
+//            description: "Workspace to perform BlueGreen deployment on",
+//            getDefaultValue: () => config["WorkspaceName"]);
+//config.Bind("PowerBi.WorkspaceName", workspaceName);
+//config.Bind("PowerBi.ReportId", reportId);
 
 // Get the secret from Azure Key Vault using protected values
 var secretClient = new SecretClient(new Uri(azureAd.KeyVaultUrl), new DefaultAzureCredential());

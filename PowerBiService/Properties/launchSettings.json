@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "PowerBiService": {
+      "commandName": "Project",
+      "workingDirectory": "C:\\Users\\marekaldorf\\source\\repos\\BAGIA-Support\\BAGIA-Support\\src\\PowerBiService"
+    }
+  }
+}

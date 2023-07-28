@@ -6,12 +6,6 @@ using Microsoft.Extensions.Options;
 using Azure.Security.KeyVault.Secrets;
 using Azure.Identity;
 using Microsoft.AspNetCore.DataProtection;
-using System.CommandLine;
-using System.CommandLine.Invocation;
-using System.IO;
-
-// Use appsettings.json to get new variables clientId, tenantId, username, password
-// Use the following code to get a token
 
 // Change SetBasePath to the path of your appsettings.json file in the root folde
 var projectPath = Directory.GetCurrentDirectory();
@@ -44,4 +38,4 @@ var deploymentPipelineRepository = new DeploymentPipelineRepository(client);
 
 // Run CommandOptions
 var cmdLineOptions = new CommandLineOptions();
-await cmdLineOptions.Execute(datasetRepository, workspaceRepository, reportRepository, deploymentPipelineRepository);
+cmdLineOptions.Execute(datasetRepository, workspaceRepository, reportRepository, deploymentPipelineRepository);

@@ -33,7 +33,7 @@ public class CommandLineOptions
     Option<string> pipelineOption = new Option<string>(
         name: "--pipelineId",
         description: "An option to define pipeline Id for deployment",
-        getDefaultValue: () => "tst");
+        getDefaultValue: () => "77064aec-df24-4526-a716-81cb538e8a2b");
 
     Option<string> reportGreenIdOption = new Option<string>(
         name: "--reportGreenId",
@@ -46,7 +46,7 @@ public class CommandLineOptions
         getDefaultValue: () => "tst");
 
     RootCommand rootCommand = new RootCommand(".Net App for PBI CICD");
-    public Task Execute(DatasetRepository datasetRepository, WorkspaceRepository workspaceRepository, ReportRepository reportRepository, DeploymentPipelineRepository deploymentPipelineRepository)
+    public void Execute(DatasetRepository datasetRepository, WorkspaceRepository workspaceRepository, ReportRepository reportRepository, DeploymentPipelineRepository deploymentPipelineRepository)
     {
         rootCommand.AddGlobalOption(workspaceGreenOption);
         rootCommand.AddGlobalOption(workspaceBlueOption);
@@ -79,6 +79,4 @@ public class CommandLineOptions
         },
             pipelineOption, stageOrderOption);
     }
-
-
 }

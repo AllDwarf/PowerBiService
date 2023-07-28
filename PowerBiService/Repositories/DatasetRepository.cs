@@ -36,23 +36,6 @@ public class DatasetRepository : IDatasetRepository
         return true;
     }
 
-
-    public async Task<bool> SwapReportDatasetsAsync(Report report, Dataset dataset1, Dataset dataset2, Guid id)
-    {
-        RebindReportRequest rebindReportRequest = new RebindReportRequest();
-        rebindReportRequest.DatasetId = dataset2.Id;
-        await _client.Reports.RebindReportAsync(report.Id, rebindReportRequest);
-
-        report.Validate();
-        // Test whether the report is rebound to the new dataset
-        var reports = await _client.Reports.GetReportsInGroupAsync(id);
-        var report1 = reports.Value.FirstOrDefault(r => r.Id == report.Id);
-        if (report1.DatasetId != dataset2.Id)
-        {
-            return false;
-        }
-        return true;
-    }
     public async Task<Dataset> GetDatasetById(string id)
     {
         var dataset = await _client.Datasets.GetDatasetAsync(id);
@@ -62,6 +45,7 @@ public class DatasetRepository : IDatasetRepository
         }
         return dataset;
     }
+
 
     public async Task<Dataset> CloneDataset(Guid workspaceId, DatasetRequestBody dsRequestBody)
     {
@@ -76,5 +60,11 @@ public class DatasetRepository : IDatasetRepository
 
         var dataset = await _client.Datasets.PostDatasetInGroupAsync(workspaceId, createDatasetRequest);
         return dataset;
+    }
+
+    public async Task<Datasets> GetAllDatasestsByWorkspace(Group workspace)
+    {
+        var datasets = await _client.Datasets.GetDatasetsInGroupAsync(workspace.Id);
+        return datasets;
     }
 }

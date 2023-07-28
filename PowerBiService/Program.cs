@@ -8,6 +8,7 @@ using Azure.Identity;
 using Microsoft.AspNetCore.DataProtection;
 using System.CommandLine;
 using System.CommandLine.Invocation;
+using System.IO;
 
 // Use appsettings.json to get new variables clientId, tenantId, username, password
 // Use the following code to get a token
@@ -17,25 +18,13 @@ var projectPath = Directory.GetCurrentDirectory();
 var config = new ConfigurationBuilder()
     .SetBasePath(projectPath)
     .AddJsonFile("appsettings.development.json", optional: false)
+    .AddCommandLine(args)
     .Build();
 
 // Bind the AzureAd section of appsettings.json to the AzureAd class
 var azureAd = new AzureAd();
 config.Bind("AzureAd", azureAd);
 IOptions<AzureAd> azureAdOption = Options.Create(azureAd);
-
-//// Bind command line options to the configuration
-//var reportId = new Option<string>(
-//            name: "--reportId",
-//            description: "Report ID to perform BlueGreen deployment on",
-//            getDefaultValue: () => config["ReportId"]);
-
-//var workspaceName = new Option<string>(
-//            name: "--workspaceName",
-//            description: "Workspace to perform BlueGreen deployment on",
-//            getDefaultValue: () => config["WorkspaceName"]);
-//config.Bind("PowerBi.WorkspaceName", workspaceName);
-//config.Bind("PowerBi.ReportId", reportId);
 
 // Get the secret from Azure Key Vault using protected values
 var secretClient = new SecretClient(new Uri(azureAd.KeyVaultUrl), new DefaultAzureCredential());
@@ -51,6 +40,8 @@ using var client = await authenticator.AuthenticateAsync();
 var reportRepository = new ReportRepository(client);
 var workspaceRepository = new WorkspaceRepository(client);
 var datasetRepository = new DatasetRepository(client);
+var deploymentPipelineRepository = new DeploymentPipelineRepository(client);
 
-new PowerBiReportSwap(reportRepository, workspaceRepository, datasetRepository, config);
-
+// Run CommandOptions
+var cmdLineOptions = new CommandLineOptions();
+await cmdLineOptions.Execute(datasetRepository, workspaceRepository, reportRepository, deploymentPipelineRepository);

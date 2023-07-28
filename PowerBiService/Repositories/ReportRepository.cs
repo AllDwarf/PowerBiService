@@ -11,10 +11,32 @@ public class ReportRepository : IReportRepository
     {
         _client = client;
     }
-    public async Task<Report> CloneReportAsync(Report report)
+    public async Task<Stream> ExportReportStream(Report report)
     {
-        report = await _client.Reports.CloneReportAsync(report.Id, new CloneReportRequest());
-        return report;
+        //report = await _client.Reports.CloneReportAsync(report.Id, new CloneReportRequest());
+        var reportStream = await _client.Reports.ExportReportAsync(report.Id);
+        return reportStream;
+    }
+
+    public async Task<Import> ImportReportStream(Stream reportStream, Guid groupId)
+    {
+        // Start the import
+        var importResult = await _client.Imports.PostImportWithFileAsync(groupId, reportStream, nameConflict: "CreateOrOverwrite");
+
+        // Wait for the import to complete
+        while (importResult.ImportState != "Succeeded" && importResult.ImportState != "Failed")
+        {
+            importResult = await _client.Imports.GetImportAsync(groupId, importResult.Id);
+            await Task.Delay(1000);
+        }
+
+        // Check if the import succeeded
+        if (importResult.ImportState != "Succeeded")
+        {
+            throw new Exception("Publish of .pbix file failed!");
+        }
+        return importResult;
+
     }
 
     public async Task<Report> GetReportById(Guid id, Group group)

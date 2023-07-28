@@ -44,4 +44,4 @@ var deploymentPipelineRepository = new DeploymentPipelineRepository(client);
 
 // Run CommandOptions
 var cmdLineOptions = new CommandLineOptions();
-await cmdLineOptions.Execute(datasetRepository, workspaceRepository, reportRepository, deploymentPipelineRepository);
+cmdLineOptions.Execute(datasetRepository, workspaceRepository, reportRepository, deploymentPipelineRepository);

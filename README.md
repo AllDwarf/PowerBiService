@@ -9,20 +9,30 @@ To get started with this project, you will need to have the following prerequisi
 - Visual Studio 2019 or later (or VS Code with .Net extension)
 - .NET 7.0 and later
 - Microsoft.PowerBI.API NuGet package
+- Micorsoft.Identity
 
 Once you have installed the prerequisites, you can clone the repository and open the solution in Visual Studio. You can then build and run the solution to deploy the reports and datasets.
 
-## Deployment
-
-To deploy the reports and datasets, you can use the following steps:
-
-1. Create a new workspace in Power BI for the new version of the reports and datasets.
-2. Deploy the new version of the reports and datasets to the new workspace using the Microsoft.PowerBI.API NuGet package.
-3. Test the new version of the reports and datasets to ensure that they are working correctly.
-4. Once the new version has been fully tested and verified, switch traffic to the new version by updating the connection strings in your application or redirecting traffic to the new workspace.
-5. Monitor the new version of the reports and datasets to ensure that they are working correctly.
-6. If any issues are found, rollback to the previous version by redirecting traffic back to the old workspace.
-
+## Usage
+You can run dot net cli to perform certain commands using some arguments:
+### Commands
+- ```blueGreen```: Run Blue Green deployment for given workspaces.
+    - ```dotnet run blueGreen --reportBlueId "123" --reportGreenId "456" --workspaceGreen "YOUR GREEN WORKSPACE NAME" --workspaceBlue "YOUR BLUE WORKSPACE NAME"```
+- ```refresh```: Run refresh for all objects for given workspace.
+    - ```dotnet run refresh --workspaceName "YOUR WORKSPACE NAME"```
+- ```deploy```: Run deployment pipeline for given workspace.
+    - ```dotnet run deploy --pipelineId "789" --stageOrder 0```
+### Options
+- ```blueGreen```
+    - ```--reportBlueId```: The ID of the blue report.
+    - ```--reportGreenId```: The ID of the green report.
+    - ```--workspaceGreen```: The name of the green workspace.
+    - ```--workspaceBlue```: The name of the blue workspace.
+ - ```refresh```   
+    - ```--workspaceName```: The name of the workspace.
+- ```deploy```
+    - ```--pipelineId```: The ID of the deployment pipeline.
+    - ```--stageOrder```: The order of the stage in the deployment pipeline.
 ## Continuous Deployment
 
 To enable continuous deployment of the reports and datasets, you can use Azure DevOps. You can create a new pipeline that builds and deploys the reports and datasets to the new workspace whenever changes are made to the code. You can also configure the pipeline to automatically test the new version of the reports and datasets and rollback to the previous version in case of issues.

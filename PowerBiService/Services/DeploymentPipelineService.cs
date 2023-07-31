@@ -8,20 +8,19 @@ using System.Threading.Tasks;
 
 namespace PowerBiService.Services;
 
-public class DeploymentPipeline
+public class DeploymentPipelineService : IServiceRepository
 {
     private int _deploymentStageOrder;
     private Guid _pipelineId;
     private readonly IDeploymentPipelineRepository _deploymentPipelineRepository;
-    public DeploymentPipeline(string pipelineId, int deploymentStageOrder, IDeploymentPipelineRepository deploymentPipelineRepository) 
+    public DeploymentPipelineService(string pipelineId, int deploymentStageOrder, IDeploymentPipelineRepository deploymentPipelineRepository)
     {
         _pipelineId = new Guid(pipelineId);
         _deploymentStageOrder = deploymentStageOrder;
         _deploymentPipelineRepository = deploymentPipelineRepository;
-        DeployAllInWorkspace().Wait();
     }
 
-    private async Task DeployAllInWorkspace() 
+    public async Task InvokeServiceAsync()
     {
         var pipeline = await _deploymentPipelineRepository.GetPipelineByIdAsync(_pipelineId);
         await _deploymentPipelineRepository.RunDeploymentPipelineForAllAsync(_deploymentStageOrder, pipeline);

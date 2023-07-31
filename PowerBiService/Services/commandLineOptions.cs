@@ -3,7 +3,9 @@ using PowerBiService.Services;
 using System;
 using System.Collections.Generic;
 using System.CommandLine;
+using System.CommandLine.Invocation;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -46,36 +48,81 @@ public class CommandLineOptions
         getDefaultValue: () => "tst");
 
     RootCommand rootCommand = new RootCommand(".Net App for PBI CICD");
-    public void Execute(DatasetRepository datasetRepository, WorkspaceRepository workspaceRepository, ReportRepository reportRepository, DeploymentPipelineRepository deploymentPipelineRepository)
+    public void Execute(DatasetRepository datasetRepository, WorkspaceRepository workspaceRepository, ReportRepository reportRepository, DeploymentPipelineRepository deploymentPipelineRepository, string[] args)
     {
-        rootCommand.AddGlobalOption(workspaceGreenOption);
-        rootCommand.AddGlobalOption(workspaceBlueOption);
+        Command blueGreenCommand, refreshCommand, deploymentCommand;
+        CommandSetter(datasetRepository, workspaceRepository, reportRepository, deploymentPipelineRepository, out blueGreenCommand, out refreshCommand, out deploymentCommand);
 
-        var blueGreenCommand = new Command("blueGreen", "Run Blue Green deployment for given workspaces.");
-        rootCommand.AddCommand(blueGreenCommand);
-        blueGreenCommand.SetHandler((reportBlueId, reportGreenId, workspaceGreen, workspaceBlue) =>
+        // Parse the command line arguments
+        var parseResult = rootCommand.Parse(args);
+
+        // Check if a subcommand was specified
+        if (parseResult.CommandResult.Command != rootCommand)
         {
-            new DeploymentBlueGreen(reportRepository, workspaceRepository, datasetRepository, reportBlueId, reportGreenId, workspaceGreen, workspaceBlue);
+            // A subcommand was specified
+            var subcommand = parseResult.CommandResult.Command;
+            Console.WriteLine($"Subcommand '{subcommand.Name}' specified");
+
+            // Check for options of the subcommand
+            foreach (var option in subcommand.Options)
+            {
+                Console.WriteLine($"Option '{option.Name}' specified with value '{parseResult.CommandResult.GetValueForOption(option)}'");
+                if (parseResult.CommandResult.Command.Name == "refresh" && option.Name == "workspaceName" && parseResult.CommandResult.GetValueForOption(option) != null)
+                {
+                    refreshCommand.Invoke(args);
+                }
+                else if (parseResult.CommandResult.Command.Name == "deploy" && option.Name == "pipelineId" && option.Name == "stageOrder" && parseResult.CommandResult.GetValueForOption(option) != null)
+                {
+                    deploymentCommand.Invoke(args);
+                }
+                else if (parseResult.CommandResult.Command.Name == "blueGreen" && option.Name == "workspaceGreen" && option.Name == "workspaceBlue" && parseResult.CommandResult.GetValueForOption(option) != null)
+                {
+                    blueGreenCommand.Invoke(args);
+                }
+            }
+        }
+        else
+        {
+            // No subcommand was specified
+            Console.WriteLine("No subcommand specified");
+        }
+    }
+
+    private void CommandSetter(DatasetRepository datasetRepository, WorkspaceRepository workspaceRepository, ReportRepository reportRepository, DeploymentPipelineRepository deploymentPipelineRepository, out Command blueGreenCommand, out Command refreshCommand, out Command deploymentCommand)
+    {
+        blueGreenCommand = new Command("blueGreen", "Run Blue Green deployment for given workspaces.");
+        rootCommand.AddCommand(blueGreenCommand);
+        blueGreenCommand.AddGlobalOption(workspaceGreenOption);
+        blueGreenCommand.AddGlobalOption(workspaceBlueOption);
+        blueGreenCommand.SetHandler(async (reportBlueId, reportGreenId, workspaceGreen, workspaceBlue) =>
+        {
+            Console.WriteLine("Running Blue Green Deployment");
+            var blueGreenService = new BlueGreenService(reportRepository, workspaceRepository, datasetRepository, reportBlueId, reportGreenId, workspaceGreen, workspaceBlue);
+            await blueGreenService.InvokeServiceAsync();
         }
         , reportBlueIdOption, reportGreenIdOption, workspaceGreenOption, workspaceBlueOption
         );
 
-        var refreshCommand = new Command("refresh", "Run Refresh All Datasets for given workspace.");
+        refreshCommand = new Command("refresh", "Run Refresh All Datasets for given workspace.");
         rootCommand.AddCommand(refreshCommand);
-        refreshCommand.AddOption(workspaceOption);
-        refreshCommand.SetHandler((workspaceName) =>
+        refreshCommand.AddGlobalOption(workspaceOption);
+        refreshCommand.SetHandler(async (workspaceName) =>
         {
-            new AfterDeploymentRefresh(workspaceRepository, datasetRepository, workspaceName);
+            Console.WriteLine("Running After Deployment Refresh");
+            var afterDeploymentRefresh = new RefreshService(workspaceRepository, datasetRepository, workspaceName);
+            await afterDeploymentRefresh.InvokeServiceAsync();
         },
             workspaceOption);
 
-        var deploymentCommand = new Command("deploy", "Run Refresh All Datasets for given workspace.");
+        deploymentCommand = new Command("deploy", "Run Refresh All Datasets for given workspace.");
         rootCommand.AddCommand(deploymentCommand);
-        deploymentCommand.AddOption(pipelineOption);
-        deploymentCommand.AddOption(stageOrderOption);
-        deploymentCommand.SetHandler((pipelineId, stageOrder) =>
+        deploymentCommand.AddGlobalOption(pipelineOption);
+        deploymentCommand.AddGlobalOption(stageOrderOption);
+        deploymentCommand.SetHandler(async (pipelineId, stageOrder) =>
         {
-            new DeploymentPipeline(pipelineId, stageOrder, deploymentPipelineRepository);
+            Console.WriteLine($"Running After Deployment of pipeline: {pipelineId}");
+            var deploymentPipelineService = new DeploymentPipelineService(pipelineId, stageOrder, deploymentPipelineRepository);
+            await deploymentPipelineService.InvokeServiceAsync();
         },
             pipelineOption, stageOrderOption);
     }

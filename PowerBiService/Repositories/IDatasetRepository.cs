@@ -9,6 +9,6 @@ public interface IDatasetRepository
     Task<Dataset> GetDatasetByReportAsync(Group group, Report report);
     Task<Dataset> GetDatasetById(string id);
     Task<bool> RefreshDatasetAsync(Dataset dataset);
-    Task<Dataset> CloneDataset(Guid workspaceId, DatasetRequestBody dsRequestBody);
+    // Task<Dataset> CloneDataset(Guid workspaceId, DatasetRequestBody dsRequestBody);
     Task<Datasets> GetAllDatasestsByWorkspace(Group workspace);
 }

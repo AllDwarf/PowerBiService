@@ -9,26 +9,25 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace PowerBiService.Services;
-public class AfterDeploymentRefresh
+public class RefreshService : IServiceRepository
 {
     private readonly IWorkspaceRepository _workspaceRepository;
     private readonly IDatasetRepository _datasetRepository;
     private readonly string _workspaceName;
-    public AfterDeploymentRefresh(IWorkspaceRepository workspaceRepository,
+    public RefreshService(IWorkspaceRepository workspaceRepository,
                           IDatasetRepository datasetRepository,
                           string workspaceName)
     {
         _workspaceRepository = workspaceRepository;
         _datasetRepository = datasetRepository;
         _workspaceName = workspaceName;
-        RefreshAllDatasetsInWorkspace().Wait();
     }
 
-    private async Task RefreshAllDatasetsInWorkspace()
+    public async Task InvokeServiceAsync()
     {
         var workspace = await _workspaceRepository.GetWorskpaceByNameAsync(_workspaceName);
         var datasets = await _datasetRepository.GetAllDatasestsByWorkspace(workspace);
-        foreach ( var dataset in datasets.Value)
+        foreach (var dataset in datasets.Value)
         {
             await _datasetRepository.RefreshDatasetAsync(dataset);
         }

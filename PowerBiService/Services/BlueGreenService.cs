@@ -1,12 +1,12 @@
 ﻿using System.Threading.Tasks;
-using PowerBiService.Repositories;
 using Microsoft.Extensions.Configuration;
 using PowerBiService.Models;
 using Microsoft.PowerBI.Api.Models;
 using Microsoft.AspNetCore.Razor.TagHelpers;
+using PowerBiService.Repositories;
 
 namespace PowerBiService.Services;
-public class DeploymentBlueGreen
+public class BlueGreenService : IServiceRepository
 {
     private readonly IReportRepository _reportRepository;
     private readonly IWorkspaceRepository _workspaceRepository;
@@ -16,7 +16,7 @@ public class DeploymentBlueGreen
     private readonly string _workspaceGreen;
     private readonly string _workspaceBlue;
 
-    public DeploymentBlueGreen(IReportRepository reportRepository,
+    public BlueGreenService(IReportRepository reportRepository,
                           IWorkspaceRepository workspaceRepository,
                           IDatasetRepository datasetRepository,
                           string reportBlueId,
@@ -31,10 +31,9 @@ public class DeploymentBlueGreen
         _reportGreenId = new Guid(reportGreenId);
         _workspaceGreen = workspaceGreen;
         _workspaceBlue = workspaceBlue;
-        HandleBlueGreenDeploymentAsync().Wait();
     }
 
-    private async Task HandleBlueGreenDeploymentAsync()
+    public async Task InvokeServiceAsync()
     {
 
         // Get workspace, report, dataset, tables, relationships, datasources
@@ -44,10 +43,10 @@ public class DeploymentBlueGreen
 
         var reportGreen = await _reportRepository.GetReportById(_reportGreenId, workspaceGreen);
         var datasetGreen = await _datasetRepository.GetDatasetByReportAsync(workspaceGreen, reportGreen);
-        
+
         await _datasetRepository.RefreshDatasetAsync(datasetGreen);
         reportGreen = await _reportRepository.ValidateAndUpdateReport(reportGreen);
-        
+
         var reportStream = await _reportRepository.ExportReportStream(reportGreen);
 
         var import = await _reportRepository.ImportReportStream(reportStream, workspaceBlue.Id);

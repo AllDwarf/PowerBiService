@@ -47,20 +47,20 @@ public class DatasetRepository : IDatasetRepository
     }
 
 
-    public async Task<Dataset> CloneDataset(Guid workspaceId, DatasetRequestBody dsRequestBody)
-    {
-        CreateDatasetRequest createDatasetRequest = new();
-        // Create a new dataset with the same tables as an existing dataset.
-        createDatasetRequest.Tables = dsRequestBody.Tables;
-        createDatasetRequest.Name = dsRequestBody.Name;
-        createDatasetRequest.Datasources = dsRequestBody.Datasources;
+    // public async Task<Dataset> CloneDataset(Guid workspaceId, DatasetRequestBody dsRequestBody)
+    // {
+    //     CreateDatasetRequest createDatasetRequest = new();
+    //     // Create a new dataset with the same tables as an existing dataset.
+    //     createDatasetRequest.Tables = dsRequestBody.Tables;
+    //     createDatasetRequest.Name = dsRequestBody.Name;
+    //     createDatasetRequest.Datasources = dsRequestBody.Datasources;
 
-        createDatasetRequest.Relationships = dsRequestBody.Relationships;
-        createDatasetRequest.Validate();
+    //     createDatasetRequest.Relationships = dsRequestBody.Relationships;
+    //     createDatasetRequest.Validate();
 
-        var dataset = await _client.Datasets.PostDatasetInGroupAsync(workspaceId, createDatasetRequest);
-        return dataset;
-    }
+    //     var dataset = await _client.Datasets.PostDatasetInGroupAsync(workspaceId, createDatasetRequest);
+    //     return dataset;
+    // }
 
     public async Task<Datasets> GetAllDatasestsByWorkspace(Group workspace)
     {

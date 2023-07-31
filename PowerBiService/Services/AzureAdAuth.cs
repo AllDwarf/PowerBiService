@@ -31,7 +31,13 @@ public class AzureAdAuth : IAzureAdAuth
 
     public async Task<PowerBIClient> AuthenticateAsync()
     {
-        AuthenticationResult authenticationResult = null; // Initialize the result variable
+        AuthenticationResult? authenticationResult = null; // Initialize the result variable
+        // Check for non null reference for authenticationResult
+        if (authenticationResult == null || azureAd.Value.PbiPassword == null)
+        {
+            throw new ArgumentNullException(nameof(authenticationResult));
+        }
+
         if (azureAd.Value.AuthenticationMode.Equals("masteruser", StringComparison.InvariantCultureIgnoreCase)) // If the authentication mode is master user...
         {
             // Create a public client to authorize the app with the AAD app
@@ -39,8 +45,9 @@ public class AzureAdAuth : IAzureAdAuth
             var userAccounts = clientApp.GetAccountsAsync().Result; // Get the user accounts
 
             SecureString password = new SecureString(); // Initialize a secure string to hold the password
-            foreach (var key in azureAd.Value.PbiPassword) // Loop through each character of the password
+            for (int i = 0; i < azureAd.Value.PbiPassword.Length; i++) // Loop through each character of the password
             {
+                char key = azureAd.Value.PbiPassword[i];
                 password.AppendChar(key); // Add the character to the secure string
             }
             // Acquire Access token from AAD app to access Power BI interactively using Master user credential

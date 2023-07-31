@@ -24,7 +24,7 @@ IOptions<AzureAd> azureAdOption = Options.Create(azureAd);
 var secretClient = new SecretClient(new Uri(azureAd.KeyVaultUrl), new DefaultAzureCredential());
 var dataProtector = DataProtectionProvider.Create("PowerBiServiceProtectProvider").CreateProtector("PowerBiServiceProtector");
 var secretManager = new SecretManager(secretClient, dataProtector);
-var secret = await secretManager.GetSecret(azureAd.ClientSecretName);
+var secret = await secretManager.GetSecret(secretName: azureAd.ClientSecretName);
 
 // Create an instance of the AuthenticationHandler class and pass in the azureAdOption
 AzureAdAuth authenticator = new AzureAdAuth(azureAdOption, secret, dataProtector);
@@ -38,4 +38,5 @@ var deploymentPipelineRepository = new DeploymentPipelineRepository(client);
 
 // Run CommandOptions
 var cmdLineOptions = new CommandLineOptions();
-cmdLineOptions.Execute(datasetRepository, workspaceRepository, reportRepository, deploymentPipelineRepository);
+Console.WriteLine("Taking cmd line args");
+cmdLineOptions.Execute(datasetRepository, workspaceRepository, reportRepository, deploymentPipelineRepository, args);

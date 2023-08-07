@@ -67,9 +67,10 @@ public class BlueGreenService : IServiceRepository
     {
         // Refresh the dataset to ensure it has the latest data
         await _datasetRepository.RefreshDatasetAsync(dataset);
-        // Rebind the report to the dataset
-        await _reportRepository.RebindReportAsync(report, dataset);
-        // Validate the report and update the report metadata
-        await _reportRepository.ValidateAndUpdateReport(report);
+		// Rebind the report to the dataset
+		await _reportRepository.ValidateAndUpdateReport(report);
+		// Rebind the report to the dataset
+		await _reportRepository.RebindReportAsync(report, dataset);
+
     }
 }

@@ -25,11 +25,7 @@ public class WorkspaceRepository : IWorkspaceRepository
         var info = _client.WorkspaceInfo;
         var groups = await _client.Groups.GetGroupsAsync();
         //var groups = await _client.Groups();
-        var group = groups.Value.FirstOrDefault(g => g.Name == name);
-        if (group == null)
-        {
-            throw new Exception($"Group with name {name} not found");
-        }
+        var group = groups.Value.FirstOrDefault(g => g.Name == name) ?? throw new Exception($"Group with name {name} not found");
         return group;
     }
 }

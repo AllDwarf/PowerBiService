@@ -12,46 +12,45 @@ using System.Threading.Tasks;
 namespace PowerBiService.Services;
 public class CommandLineOptions
 {
-    Option<string> workspaceGreenOption = new Option<string>(
+    readonly Option<string> workspaceGreenOption = new(
     name: "--workspaceGreen",
     description: "An option to define Workspace Name of Green Environment",
     getDefaultValue: () => "FHL Blue Green - Green");
 
-    Option<string> workspaceBlueOption = new Option<string>(
+    readonly Option<string> workspaceBlueOption = new(
         name: "--workspaceBlue",
         description: "An option to define Workspace Name of Blue Environment",
         getDefaultValue: () => "FHL Blue Green - Blue");
 
-    Option<string> workspaceOption = new Option<string>(
+    readonly Option<string> workspaceOption = new(
         name: "--workspaceName",
         description: "An option to define Workspace Name of Blue Environment",
         getDefaultValue: () => "FHL Blue Green - Green");
 
-    Option<int> stageOrderOption = new Option<int>(
+    readonly Option<int> stageOrderOption = new(
         name: "--stageOrder",
         description: "An option to define on which stage should be deployment performed",
         getDefaultValue: () => 0);
 
-    Option<string> pipelineOption = new Option<string>(
+    readonly Option<string> pipelineOption = new(
         name: "--pipelineId",
         description: "An option to define pipeline Id for deployment",
         getDefaultValue: () => "77064aec-df24-4526-a716-81cb538e8a2b");
 
-    Option<string> reportGreenIdOption = new Option<string>(
+    readonly Option<string> reportGreenIdOption = new(
         name: "--reportGreenId",
         description: "An option to define Green ReportId",
         getDefaultValue: () => "e0ddd407-a2ce-4ead-a6cd-033ad40d6c6d");
 
-    Option<string> reportBlueIdOption = new Option<string>(
+    readonly Option<string> reportBlueIdOption = new(
         name: "--reportBlueId",
         description: "An option to define Blue ReportId",
         getDefaultValue: () => "tst");
 
-    RootCommand rootCommand = new RootCommand(".Net App for PBI CICD");
+    readonly RootCommand rootCommand = new(".Net App for PBI CICD");
     public void Execute(DatasetRepository datasetRepository, WorkspaceRepository workspaceRepository, ReportRepository reportRepository, DeploymentPipelineRepository deploymentPipelineRepository, string[] args)
     {
-        Command blueGreenCommand, refreshCommand, deploymentCommand;
-        CommandSetter(datasetRepository, workspaceRepository, reportRepository, deploymentPipelineRepository, out blueGreenCommand, out refreshCommand, out deploymentCommand);
+        CommandSetter(datasetRepository, workspaceRepository, reportRepository, deploymentPipelineRepository, out Command blueGreenCommand, out Command refreshCommand, out Command deploymentCommand);
 
         // Parse the command line arguments
         var parseResult = rootCommand.Parse(args);

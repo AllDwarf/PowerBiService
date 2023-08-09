@@ -20,14 +20,20 @@ var azureAd = new AzureAd();
 config.Bind("AzureAd", azureAd);
 IOptions<AzureAd> azureAdOption = Options.Create(azureAd);
 
+// If config or azureAd is not set skip the rest of the code
+if (config == null || azureAd == null || azureAd.KeyVaultUrl == null|| azureAd.ClientSecretName == null)
+{
+    Console.WriteLine("Config or AzureAd is null");
+    return;
+}
 // Get the secret from Azure Key Vault using protected values
-var secretClient = new SecretClient(new Uri(azureAd.KeyVaultUrl), new DefaultAzureCredential());
+SecretClient secretClient = new(new Uri(azureAd.KeyVaultUrl), new DefaultAzureCredential());
 var dataProtector = DataProtectionProvider.Create("PowerBiServiceProtectProvider").CreateProtector("PowerBiServiceProtector");
 var secretManager = new SecretManager(secretClient, dataProtector);
 var secret = await secretManager.GetSecret(secretName: azureAd.ClientSecretName);
 
 // Create an instance of the AuthenticationHandler class and pass in the azureAdOption
-AzureAdAuth authenticator = new AzureAdAuth(azureAdOption, secret, dataProtector);
+AzureAdAuth authenticator = new(azureAdOption, secret, dataProtector);
 using var client = await authenticator.AuthenticateAsync();
 
 // Initialize the PowerBiHandler and pass in the configuration, reportRepository, workspaceRepository, and datasetRepository

@@ -2,6 +2,7 @@
   "profiles": {
     "PowerBiService": {
       "commandName": "Project",
+      "commandLineArgs": "refresh --workspaceName \"FHL Blue Green - DEV\"",
       "workingDirectory": "C:\\Users\\marekaldorf\\source\\repos\\PowerBiService\\PowerBiService"
     }
   }

@@ -13,8 +13,15 @@ public class DeploymentPipelineRepository : IDeploymentPipelineRepository
     }
     public async Task<Pipeline> GetPipelineByIdAsync(Guid pipelineId)
     {
-        var pipeline = await _client.Pipelines.GetPipelineAsync(pipelineId);
-        return pipeline;
+        try
+        {
+            var pipeline = await _client.Pipelines.GetPipelineAsync(pipelineId);
+            return pipeline;
+        }
+        catch (Exception)
+        {
+            throw new Exception($"Pipeline with id {pipelineId} not found!");
+        }
     }
 
     public async Task<bool> RunDeploymentPipelineForAllAsync(int stage, Pipeline pipeline)

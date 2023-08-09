@@ -25,8 +25,15 @@ public class DatasetRepository : IDatasetRepository
 
     public async Task<bool> RefreshDatasetAsync(Dataset dataset)
     {
-        await _client.Datasets.RefreshDatasetAsync(dataset.Id);
-        return true;
+        try
+        {
+            await _client.Datasets.RefreshDatasetAsync(dataset.Id);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Failed to refresh dataset {dataset.Id} with Message: {ex.Message}");
+        }
     }
 
     public async Task<Dataset> GetDatasetById(string id)
@@ -35,25 +42,23 @@ public class DatasetRepository : IDatasetRepository
         return dataset;
     }
 
-
-    // public async Task<Dataset> CloneDataset(Guid workspaceId, DatasetRequestBody dsRequestBody)
-    // {
-    //     CreateDatasetRequest createDatasetRequest = new();
-    //     // Create a new dataset with the same tables as an existing dataset.
-    //     createDatasetRequest.Tables = dsRequestBody.Tables;
-    //     createDatasetRequest.Name = dsRequestBody.Name;
-    //     createDatasetRequest.Datasources = dsRequestBody.Datasources;
-
-    //     createDatasetRequest.Relationships = dsRequestBody.Relationships;
-    //     createDatasetRequest.Validate();
-
-    //     var dataset = await _client.Datasets.PostDatasetInGroupAsync(workspaceId, createDatasetRequest);
-    //     return dataset;
-    // }
-
     public async Task<Datasets> GetAllDatasestsByWorkspace(Group workspace)
     {
-        var datasets = await _client.Datasets.GetDatasetsInGroupAsync(workspace.Id);
+        var datasets = await _client.Datasets.GetDatasetsInGroupAsync(workspace.Id) ?? throw new Exception("Datasets not found");
         return datasets;
+    }
+
+    public async Task<bool> UpdateDataSourceConnectionDetails(Group workspace, Dataset dataset, string connectionString)
+    {
+        try
+        {
+            var connectionDetails = new ConnectionDetails(connectionString);
+            await _client.Datasets.SetAllDatasetConnectionsAsync(workspace.Id, dataset.Id, connectionDetails);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Failed to set connection details for dataset {dataset.Name}. {ex.Message}");
+        }
     }
 }

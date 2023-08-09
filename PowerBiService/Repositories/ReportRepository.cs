@@ -13,7 +13,6 @@ public class ReportRepository : IReportRepository
     }
     public async Task<Stream> ExportReportStream(Report report)
     {
-        //report = await _client.Reports.CloneReportAsync(report.Id, new CloneReportRequest());
         var reportStream = await _client.Reports.ExportReportAsync(report.Id);
         return reportStream;
     }

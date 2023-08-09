@@ -48,19 +48,17 @@ public class ReportRepository : IReportRepository
     public async Task<Report> GetReportyByNameAsync(string name, Group group)
     {
         var reports = await _client.Reports.GetReportsAsync(group.Id);
-        var report = reports.Value.FirstOrDefault(r => Regex.IsMatch(r.Name, name));
-        if (report == null)
-        {
-            throw new Exception($"Report with name {name} not found");
-        }
+        var report = reports.Value.FirstOrDefault(r => Regex.IsMatch(r.Name, name)) ?? throw new Exception($"Report with name {name} not found");
         return report;
     }
 
     public async Task<bool> RebindReportAsync(Report report, Dataset dataset)
     {
         // Rebind the report to the new dataset
-        RebindReportRequest rebindReportRequest = new();
-        rebindReportRequest.DatasetId = dataset.Id;
+        RebindReportRequest rebindReportRequest = new()
+        {
+            DatasetId = dataset.Id
+        };
         rebindReportRequest.Validate();
         await _client.Reports.RebindReportAsync(report.Id, rebindReportRequest);
         return true;

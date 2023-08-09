@@ -1,17 +1,11 @@
-﻿using Microsoft.PowerBI.Api.Models;
-using PowerBiService.Repositories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using PowerBiService.Repositories;
 
 namespace PowerBiService.Services;
 
 public class DeploymentPipelineService : IServiceRepository
 {
-    private int _deploymentStageOrder;
-    private Guid _pipelineId;
+    private readonly int _deploymentStageOrder;
+    private readonly Guid _pipelineId;
     private readonly IDeploymentPipelineRepository _deploymentPipelineRepository;
     public DeploymentPipelineService(string pipelineId, int deploymentStageOrder, IDeploymentPipelineRepository deploymentPipelineRepository)
     {

@@ -1,13 +1,5 @@
 ﻿using PowerBiService.Repositories;
-using PowerBiService.Services;
-using System;
-using System.Collections.Generic;
 using System.CommandLine;
-using System.CommandLine.Invocation;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PowerBiService.Services;
 public class CommandLineOptions

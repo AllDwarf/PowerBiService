@@ -16,16 +16,8 @@ public class SecretManager : ISecretManager
     // Retrieve a secret from Azure Key Vault and return the protected secret value.
     private async Task<String> GetProtectedSecretAsync(string secretName)
     {
-        var secret = await _client.GetSecretAsync(name: secretName);
-        if (secret == null)
-        {
-            throw new Exception($"Secret {secretName} not found.");
-        }
-        var val = secret.Value.Value;
-        if (val == null)
-        {
-            throw new Exception($"Secret {secretName} has no value.");
-        }
+        var secret = await _client.GetSecretAsync(name: secretName) ?? throw new Exception($"Secret {secretName} not found.");
+        var val = secret.Value.Value ?? throw new Exception($"Secret {secretName} has no value.");
         var protectedSecret = _protector.Protect(val);
         return protectedSecret;
     }

@@ -1,12 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using PowerBiService.Repositories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+﻿using PowerBiService.Repositories;
 
 namespace PowerBiService.Services;
 public class RefreshService : IServiceRepository

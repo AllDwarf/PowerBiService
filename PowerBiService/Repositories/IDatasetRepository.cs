@@ -1,5 +1,4 @@
 ﻿using Microsoft.PowerBI.Api.Models;
-using PowerBiService.Models;
 
 namespace PowerBiService.Repositories;
 

@@ -1,8 +1,5 @@
-﻿using System.Text.RegularExpressions;
-using System.Xml.Linq;
-using Microsoft.PowerBI.Api;
+﻿using Microsoft.PowerBI.Api;
 using Microsoft.PowerBI.Api.Models;
-using PowerBiService.Models;
 using Group = Microsoft.PowerBI.Api.Models.Group;
 
 namespace PowerBiService.Repositories;
@@ -22,11 +19,7 @@ public class DatasetRepository : IDatasetRepository
         var datasetId = report.DatasetId;
         var datasets = await _client.Datasets.GetDatasetsAsync(group.Id);
 
-        var dataset = datasets.Value.FirstOrDefault(d => d.Id == datasetId);
-        if (dataset == null)
-        {
-            throw new Exception($"Dataset with id {datasetId} not found");
-        }
+        var dataset = datasets.Value.FirstOrDefault(d => d.Id == datasetId) ?? throw new Exception($"Dataset with id {datasetId} not found");
         return dataset;
     }
 
@@ -38,11 +31,7 @@ public class DatasetRepository : IDatasetRepository
 
     public async Task<Dataset> GetDatasetById(string id)
     {
-        var dataset = await _client.Datasets.GetDatasetAsync(id);
-        if (dataset == null)
-        {
-            throw new Exception($"Dataset with id {id} not found");
-        }
+        var dataset = await _client.Datasets.GetDatasetAsync(id) ?? throw new Exception($"Dataset with id {id} not found");
         return dataset;
     }
 

@@ -1,18 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Identity.Abstractions;
-using Microsoft.Identity.Client;
-using Microsoft.Identity.Web;
+﻿using Microsoft.Identity.Client;
 using Microsoft.PowerBI.Api;
 using Microsoft.Rest;
 using PowerBiService.Models;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using System.Security;
-using Azure.Security.KeyVault.Secrets;
 using Microsoft.AspNetCore.DataProtection;
 
 namespace PowerBiService.Services;

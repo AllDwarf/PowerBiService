@@ -1,11 +1,5 @@
 ﻿using Microsoft.PowerBI.Api;
 using Microsoft.PowerBI.Api.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace PowerBiService.Repositories;
 public class DeploymentPipelineRepository : IDeploymentPipelineRepository
@@ -25,8 +19,10 @@ public class DeploymentPipelineRepository : IDeploymentPipelineRepository
 
     public async Task<bool> RunDeploymentPipelineForAllAsync(int stage, Pipeline pipeline)
     {
-        var deployRequest = new DeployAllRequest();
-        deployRequest.SourceStageOrder = stage;
+        var deployRequest = new DeployAllRequest
+        {
+            SourceStageOrder = stage
+        };
         deployRequest.Options.AllowOverwriteArtifact = true;
         deployRequest.Options.AllowCreateArtifact = true;
 

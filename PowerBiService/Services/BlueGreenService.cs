@@ -1,8 +1,4 @@
-﻿using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
-using PowerBiService.Models;
-using Microsoft.PowerBI.Api.Models;
-using Microsoft.AspNetCore.Razor.TagHelpers;
+﻿using Microsoft.PowerBI.Api.Models;
 using PowerBiService.Repositories;
 
 namespace PowerBiService.Services;

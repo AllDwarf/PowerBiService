@@ -89,6 +89,7 @@ public class CommandLineOptions
 
     private void CommandSetter(DatasetRepository datasetRepository, WorkspaceRepository workspaceRepository, ReportRepository reportRepository, DeploymentPipelineRepository deploymentPipelineRepository, out Command blueGreenCommand, out Command refreshCommand, out Command deploymentCommand)
     {
+        // Initiate Blue Green deployment
         blueGreenCommand = new Command("blueGreen", "Run Blue Green deployment for given workspaces.");
         rootCommand.AddCommand(blueGreenCommand);
         blueGreenCommand.AddGlobalOption(workspaceGreenOption);
@@ -96,12 +97,15 @@ public class CommandLineOptions
         blueGreenCommand.SetHandler(async (reportBlueId, reportGreenId, workspaceGreen, workspaceBlue) =>
         {
             Console.WriteLine("Running Blue Green Deployment");
-            var blueGreenService = new BlueGreenService(reportRepository, workspaceRepository, datasetRepository, reportBlueId, reportGreenId, workspaceGreen, workspaceBlue);
+            var blueGreenService = new BlueGreenService(
+                reportRepository, workspaceRepository, datasetRepository, 
+                reportBlueId, reportGreenId, workspaceGreen, workspaceBlue);
             await blueGreenService.InvokeServiceAsync();
         }
         , reportBlueIdOption, reportGreenIdOption, workspaceGreenOption, workspaceBlueOption
         );
 
+        // Refresh all datasets for a given workspace
         refreshCommand = new Command("refresh", "Run Refresh All Datasets for given workspace.");
         rootCommand.AddCommand(refreshCommand);
         refreshCommand.AddGlobalOption(workspaceOption);
@@ -113,6 +117,7 @@ public class CommandLineOptions
         },
             workspaceOption);
 
+        // Deployment of a pipeline
         deploymentCommand = new Command("deploy", "Run Refresh All Datasets for given workspace.");
         rootCommand.AddCommand(deploymentCommand);
         deploymentCommand.AddGlobalOption(pipelineOption);

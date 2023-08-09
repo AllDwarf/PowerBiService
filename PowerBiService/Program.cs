@@ -7,7 +7,7 @@ using Azure.Security.KeyVault.Secrets;
 using Azure.Identity;
 using Microsoft.AspNetCore.DataProtection;
 
-// Change SetBasePath to the path of your appsettings.json file in the root folde
+// Change SetBasePath to the path of your appsettings.json file in the root folder
 var projectPath = Directory.GetCurrentDirectory();
 var config = new ConfigurationBuilder()
     .SetBasePath(projectPath)

@@ -36,32 +36,39 @@ public class BlueGreenService : IServiceRepository
     public async Task InvokeServiceAsync()
     {
 
-        // Get workspace, report, dataset, tables, relationships, datasources
-        // Using the repositories
+        // Get workspaces both Blue and Green
         var workspaceGreen = await _workspaceRepository.GetWorskpaceByNameAsync(_workspaceGreen);
         var workspaceBlue = await _workspaceRepository.GetWorskpaceByNameAsync(_workspaceBlue);
         // Get report from green workspace
         var reportGreen = await _reportRepository.GetReportById(_reportGreenId, workspaceGreen);
-        // Get dataset from green workspace
+        // Get dataset from green workspace and report
         var datasetGreen = await _datasetRepository.GetDatasetByReportAsync(workspaceGreen, reportGreen);
+
         // Refresh dataset
         await _datasetRepository.RefreshDatasetAsync(datasetGreen);
         // Validate and update report
         reportGreen = await _reportRepository.ValidateAndUpdateReport(reportGreen);
-        // Export report to stream
+
+        // Export report and dataset to stream
         var reportStream = await _reportRepository.ExportReportStream(reportGreen);
         // Import stream to blue workspace
         var import = await _reportRepository.ImportReportStream(reportStream, workspaceBlue.Id);
+
+        // Get import status and wait for import to complete
+        var isImportStatusSuccess = import.ImportState.Equals("Succeeded");
+        if (!isImportStatusSuccess)
+        {
+            Console.WriteLine("Import failed");
+            return;
+        }
         // Get report from blue workspace
         var reportBlue = await _reportRepository.GetReportById(_reportBlueId, workspaceBlue);
+
+        // Get dataset from blue workspace and report
+        var datasetBlue = await _datasetRepository.GetDatasetByReportAsync(workspaceBlue, reportBlue);
+
         // Rebind report to dataset that was imported
         await _reportRepository.RebindReportAsync(reportBlue, datasetGreen);
-        // Get dataset from import
-        var datasetBlue = import.Datasets[0];
-        if (datasetBlue == null)
-        {
-            throw new Exception("Dataset is not present in imported stream!");
-        }
 
         // Swap and validate reports
         await SwapAndValidateReports(reportBlue, datasetBlue);

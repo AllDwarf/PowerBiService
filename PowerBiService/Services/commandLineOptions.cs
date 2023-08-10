@@ -19,6 +19,16 @@ public class CommandLineOptions
         description: "An option to define Workspace Name of Blue Environment",
         getDefaultValue: () => "FHL Blue Green - Green");
 
+    readonly Option<string> datasetOption = new(
+        name: "--datasetName",
+        description: "An option to define Dataset Name of Blue Environment",
+        getDefaultValue: () => "FHL Blue Green - Blue");
+    
+    readonly Option<string> connectionStringOption = new(
+        name: "--connectionString",
+        description: "An option to define Connection String for dataset",
+        getDefaultValue: () => "Data Source=DESKTOP-1J8J8J8;Initial Catalog=AdventureWorks;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False");
+
     readonly Option<int> stageOrderOption = new(
         name: "--stageOrder",
         description: "An option to define on which stage should be deployment performed",
@@ -42,7 +52,7 @@ public class CommandLineOptions
     readonly RootCommand rootCommand = new(".Net App for PBI CICD");
     public void Execute(DatasetRepository datasetRepository, WorkspaceRepository workspaceRepository, ReportRepository reportRepository, DeploymentPipelineRepository deploymentPipelineRepository, string[] args)
     {
-        CommandSetter(datasetRepository, workspaceRepository, reportRepository, deploymentPipelineRepository, out Command blueGreenCommand, out Command refreshCommand, out Command deploymentCommand);
+        CommandSetter(datasetRepository, workspaceRepository, reportRepository, deploymentPipelineRepository, out Command blueGreenCommand, out Command refreshCommand, out Command deploymentCommand, out Command updateConnectionStringCommand);
 
         // Parse the command line arguments
         var parseResult = rootCommand.Parse(args);
@@ -58,17 +68,23 @@ public class CommandLineOptions
             foreach (var option in subcommand.Options)
             {
                 Console.WriteLine($"Option '{option.Name}' specified with value '{parseResult.CommandResult.GetValueForOption(option)}'");
-                if (parseResult.CommandResult.Command.Name == "refresh" && option.Name == "workspaceName" && parseResult.CommandResult.GetValueForOption(option) != null)
+                switch (parseResult.CommandResult.Command.Name)
                 {
-                    refreshCommand.Invoke(args);
-                }
-                else if (parseResult.CommandResult.Command.Name == "deploy" && option.Name == "pipelineId" && option.Name == "stageOrder" && parseResult.CommandResult.GetValueForOption(option) != null)
-                {
-                    deploymentCommand.Invoke(args);
-                }
-                else if (parseResult.CommandResult.Command.Name == "blueGreen" && option.Name == "workspaceGreen" && option.Name == "workspaceBlue" && parseResult.CommandResult.GetValueForOption(option) != null)
-                {
-                    blueGreenCommand.Invoke(args);
+                    case "refresh" when option.Name == "workspaceName" && parseResult.CommandResult.GetValueForOption(option) != null:
+                        refreshCommand.Invoke(args);
+                        break;
+                    case "deploy" when option.Name == "pipelineId" && option.Name == "stageOrder" && parseResult.CommandResult.GetValueForOption(option) != null:
+                        deploymentCommand.Invoke(args);
+                        break;
+                    case "blueGreen" when option.Name == "workspaceGreen" && option.Name == "workspaceBlue" && parseResult.CommandResult.GetValueForOption(option) != null:
+                        blueGreenCommand.Invoke(args);
+                        break;
+                    case "updateConnection" when option.Name == "connectionString" && option.Name == "workspaceName" && option.Name == "datasetName" && parseResult.CommandResult.GetValueForOption(option) != null:
+                        updateConnectionStringCommand.Invoke(args);
+                        break;
+                    default:
+                        Console.WriteLine("No subcommand specified");
+                        break;
                 }
             }
         }
@@ -79,7 +95,7 @@ public class CommandLineOptions
         }
     }
 
-    private void CommandSetter(DatasetRepository datasetRepository, WorkspaceRepository workspaceRepository, ReportRepository reportRepository, DeploymentPipelineRepository deploymentPipelineRepository, out Command blueGreenCommand, out Command refreshCommand, out Command deploymentCommand)
+    private void CommandSetter(DatasetRepository datasetRepository, WorkspaceRepository workspaceRepository, ReportRepository reportRepository, DeploymentPipelineRepository deploymentPipelineRepository, out Command blueGreenCommand, out Command refreshCommand, out Command deploymentCommand, out Command updateConnectionStringCommand)
     {
         // Initiate Blue Green deployment
         blueGreenCommand = new Command("blueGreen", "Run Blue Green deployment for given workspaces.");
@@ -121,5 +137,19 @@ public class CommandLineOptions
             await deploymentPipelineService.InvokeServiceAsync();
         },
             pipelineOption, stageOrderOption);
+
+        // Update connection string for a given dataset
+        updateConnectionStringCommand = new Command("updateConnection", "Run Update Connection String for given dataset.");
+        rootCommand.AddCommand(updateConnectionStringCommand);
+        updateConnectionStringCommand.AddGlobalOption(workspaceOption);
+        updateConnectionStringCommand.AddGlobalOption(datasetOption);
+        updateConnectionStringCommand.AddGlobalOption(connectionStringOption);
+        updateConnectionStringCommand.SetHandler(async (workspaceName, datasetName, connectionString) =>
+        {
+            Console.WriteLine("Running Update Connection String");
+            var updateConnectionStringService = new UpdateConnectionStringService(workspaceRepository, datasetRepository, connectionString, workspaceName, datasetName);
+            await updateConnectionStringService.InvokeServiceAsync();
+        },
+           connectionStringOption, workspaceOption, datasetOption);
     }
 }

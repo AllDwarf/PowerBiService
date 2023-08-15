@@ -1,4 +1,5 @@
 # BlueGreen Deployment of Power BI Reports and Datasets
+[![.NET](https://github.com/AllDwarf/PowerBiService/actions/workflows/dotnet.yml/badge.svg?event=pull_request)](https://github.com/AllDwarf/PowerBiService/actions/workflows/dotnet.yml)
 
 This project demonstrates how to perform a BlueGreen deployment of Power BI reports and datasets using the [Microsoft.PowerBI.API nugget package](https://github.com/Microsoft/PowerBI-CSharp). The BlueGreen deployment strategy allows you to deploy a new version of your reports and datasets alongside the existing version, and then switch traffic to the new version once it has been fully tested and verified.
 

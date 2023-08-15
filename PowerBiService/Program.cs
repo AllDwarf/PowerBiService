@@ -21,7 +21,7 @@ config.Bind("AzureAd", azureAd);
 IOptions<AzureAd> azureAdOption = Options.Create(azureAd);
 
 // If config or azureAd is not set skip the rest of the code
-if (config == null || azureAd == null || azureAd.KeyVaultUrl == null|| azureAd.ClientSecretName == null)
+if (config == null || azureAd == null || azureAd.KeyVaultUrl == null || azureAd.ClientSecretName == null)
 {
     Console.WriteLine("Config or AzureAd is null");
     return;

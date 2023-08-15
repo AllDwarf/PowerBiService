@@ -4,7 +4,7 @@ namespace PowerBiService.Repositories
 {
     public interface IDeploymentPipelineRepository
     {
-        Task<bool> RunDeploymentPipelineForAllAsync( int stage, Pipeline pipeline );
-        Task<Pipeline> GetPipelineByIdAsync( Guid pipelineId );
+        Task<bool> RunDeploymentPipelineForAllAsync(int stage, Pipeline pipeline);
+        Task<Pipeline> GetPipelineByIdAsync(Guid pipelineId);
     }
 }

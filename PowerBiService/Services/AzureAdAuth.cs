@@ -11,7 +11,6 @@ public class AzureAdAuth : IAzureAdAuth
 {
     private readonly IOptions<AzureAd> azureAd;
     private readonly IDataProtector _protector;
-    //private string[] scopes = new string[] { "user.read" };
     private readonly string _secret;
     public AzureAdAuth(IOptions<AzureAd> azureAd, string secret, IDataProtector dataProtector)
     {
@@ -37,7 +36,7 @@ public class AzureAdAuth : IAzureAdAuth
             }
             // Acquire Access token from AAD app to access Power BI interactively using Master user credential
             authenticationResult = await clientApp.AcquireTokenByIntegratedWindowsAuth(azureAd.Value.ScopeBase).WithUsername(azureAd.Value.PbiUsername).ExecuteAsync();
- 
+
         }
 
         // Service Principal auth is the recommended by Microsoft to achieve App Owns Data Power BI embedding
@@ -58,9 +57,6 @@ public class AzureAdAuth : IAzureAdAuth
 
         var credential = new TokenCredentials(authenticationResult?.AccessToken, "Bearer");
         var client = new PowerBIClient(new Uri("https://api.powerbi.com/"), credential);
-        // var workspaceId = new Guid("e0ddd407-a2ce-4ead-a6cd-033ad40d6c6d");
-        // var datasets = await client.Datasets.GetDatasetsAsync(workspaceId);
-        // Console.WriteLine(datasets.ToString());
         return client;
     }
 }

@@ -1,4 +1,4 @@
-// Create class UpdateConnectionStringRequest use the same way as I did in BlueGreenService.cs
+﻿// Create class UpdateConnectionStringRequest use the same way as I did in BlueGreenService.cs
 //
 using Microsoft.PowerBI.Api.Models;
 using PowerBiService.Repositories;
@@ -30,11 +30,11 @@ public class UpdateConnectionStringService : IServiceRepository
         {
             var workspace = await _workspaceRepository.GetWorskpaceByNameAsync(_workspaceName);
             var datasets = await _datasetRepository.GetAllDatasestsByWorkspace(workspace);
-            if(datasets.Value.Count > 0)
+            if (datasets.Value.Count > 0)
             {
                 foreach (var dataset in datasets.Value)
                 {
-                    if(dataset.Name == _datasetName)
+                    if (dataset.Name == _datasetName)
                     {
                         await _datasetRepository.UpdateDataSourceConnectionDetails(workspace, dataset, _connectionString);
                     }
@@ -45,7 +45,7 @@ public class UpdateConnectionStringService : IServiceRepository
                 throw new Exception($"No datasets found in the workspace with name {_workspaceName}");
             }
         }
-        catch(Exception)
+        catch (Exception)
         {
             throw new Exception($"Error while updating the connection string for the workspace with name {_workspaceName}");
         }

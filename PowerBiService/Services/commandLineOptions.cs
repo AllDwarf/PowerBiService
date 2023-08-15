@@ -23,7 +23,7 @@ public class CommandLineOptions
         name: "--datasetName",
         description: "An option to define Dataset Name of Blue Environment",
         getDefaultValue: () => "FHL Blue Green - Blue");
-    
+
     readonly Option<string> connectionStringOption = new(
         name: "--connectionString",
         description: "An option to define Connection String for dataset",
@@ -106,7 +106,7 @@ public class CommandLineOptions
         {
             Console.WriteLine("Running Blue Green Deployment");
             var blueGreenService = new BlueGreenService(
-                reportRepository, workspaceRepository, datasetRepository, 
+                reportRepository, workspaceRepository, datasetRepository,
                 reportBlueId, reportGreenId, workspaceGreen, workspaceBlue);
             await blueGreenService.InvokeServiceAsync();
         }

@@ -21,7 +21,8 @@ public class RefreshService : IServiceRepository
         var datasets = await _datasetRepository.GetAllDatasestsByWorkspace(workspace);
         foreach (var dataset in datasets.Value)
         {
-            await _datasetRepository.RefreshDatasetAsync(dataset);
+            //await _datasetRepository.TakeOwnershipOfDataset(workspace, dataset);
+            await _datasetRepository.RefreshDatasetAsync(workspace, dataset);
         }
     }
 }

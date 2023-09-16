@@ -41,7 +41,7 @@ public class BlueGreenService : IServiceRepository
         var datasetGreen = await _datasetRepository.GetDatasetByReportAsync(workspaceGreen, reportGreen);
 
         // Refresh dataset
-        await _datasetRepository.RefreshDatasetAsync(datasetGreen);
+        await _datasetRepository.RefreshDatasetAsync(workspaceGreen, datasetGreen);
         // Validate and update report
         reportGreen = await _reportRepository.ValidateAndUpdateReport(reportGreen);
 
@@ -67,13 +67,13 @@ public class BlueGreenService : IServiceRepository
         await _reportRepository.RebindReportAsync(reportBlue, datasetGreen);
 
         // Swap and validate reports
-        await SwapAndValidateReports(reportBlue, datasetBlue);
+        await SwapAndValidateReports(workspaceBlue, reportBlue, datasetBlue);
     }
 
-    private async Task SwapAndValidateReports(Report report, Dataset dataset)
+    private async Task SwapAndValidateReports(Group workspace, Report report, Dataset dataset)
     {
         // Refresh the dataset to ensure it has the latest data
-        await _datasetRepository.RefreshDatasetAsync(dataset);
+        await _datasetRepository.RefreshDatasetAsync(workspace, dataset);
         // Rebind the report to the dataset
         await _reportRepository.ValidateAndUpdateReport(report);
         // Rebind the report to the dataset

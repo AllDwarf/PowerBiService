@@ -68,24 +68,25 @@ public class CommandLineOptions
             foreach (var option in subcommand.Options)
             {
                 Console.WriteLine($"Option '{option.Name}' specified with value '{parseResult.CommandResult.GetValueForOption(option)}'");
-                switch (parseResult.CommandResult.Command.Name)
-                {
-                    case "refresh" when option.Name == "workspaceName" && parseResult.CommandResult.GetValueForOption(option) != null:
-                        refreshCommand.Invoke(args);
-                        break;
-                    case "deploy" when option.Name == "pipelineId" && option.Name == "stageOrder" && parseResult.CommandResult.GetValueForOption(option) != null:
-                        deploymentCommand.Invoke(args);
-                        break;
-                    case "blueGreen" when option.Name == "workspaceGreen" && option.Name == "workspaceBlue" && parseResult.CommandResult.GetValueForOption(option) != null:
-                        blueGreenCommand.Invoke(args);
-                        break;
-                    case "updateConnection" when option.Name == "connectionString" && option.Name == "workspaceName" && option.Name == "datasetName" && parseResult.CommandResult.GetValueForOption(option) != null:
-                        updateConnectionStringCommand.Invoke(args);
-                        break;
-                    default:
-                        Console.WriteLine("No subcommand specified");
-                        break;
-                }
+            }
+
+            switch (parseResult.CommandResult.Command.Name)
+            {
+                case "refresh":
+                    refreshCommand.Invoke(args);
+                    break;
+                case "deploy":
+                    deploymentCommand.Invoke(args);
+                    break;
+                case "blueGreen":
+                    blueGreenCommand.Invoke(args);
+                    break;
+                case "updateConnection":
+                    updateConnectionStringCommand.Invoke(args);
+                    break;
+                default:
+                    Console.WriteLine("No subcommand specified");
+                    break;
             }
         }
         else

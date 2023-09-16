@@ -46,3 +46,4 @@ var deploymentPipelineRepository = new DeploymentPipelineRepository(client);
 var cmdLineOptions = new CommandLineOptions();
 Console.WriteLine("Taking cmd line args");
 cmdLineOptions.Execute(datasetRepository, workspaceRepository, reportRepository, deploymentPipelineRepository, args);
+Console.WriteLine("Program ended!");

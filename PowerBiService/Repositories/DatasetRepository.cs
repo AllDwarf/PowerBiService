@@ -1,5 +1,6 @@
 ﻿using Microsoft.PowerBI.Api;
 using Microsoft.PowerBI.Api.Models;
+using Microsoft.Rest;
 using Group = Microsoft.PowerBI.Api.Models.Group;
 
 namespace PowerBiService.Repositories;
@@ -23,11 +24,20 @@ public class DatasetRepository : IDatasetRepository
         return dataset;
     }
 
-    public async Task<bool> RefreshDatasetAsync(Dataset dataset)
+    public async Task<bool> RefreshDatasetAsync(Group workspace, Dataset dataset)
     {
         try
         {
-            await _client.Datasets.RefreshDatasetAsync(dataset.Id);
+            // Check for already running refreshes and if its not running then refresh the dataset
+            var refreshes = await _client.Datasets.GetRefreshHistoryInGroupAsync(workspace.Id, dataset.Id);
+            var refresh = refreshes.Value.FirstOrDefault(r => r.Status == "InProgress");
+            if (refresh != null)
+            {
+                await Console.Out.WriteLineAsync($"Dataset: {dataset.Name} is already being refreshed");
+                return false;
+            }
+            var request = await _client.Datasets.RefreshDatasetInGroupWithHttpMessagesAsync(workspace.Id, dataset.Id);
+            await Console.Out.WriteLineAsync($"Request for Dataset: {dataset.Name} gets StatusCode: {request.Response.StatusCode}");
             return true;
         }
         catch (Exception ex)
@@ -59,6 +69,20 @@ public class DatasetRepository : IDatasetRepository
         catch (Exception ex)
         {
             throw new Exception($"Failed to set connection details for dataset {dataset.Name}. {ex.Message}");
+        }
+    }
+
+    public async Task<bool> TakeOwnershipOfDataset(Group workspace, Dataset dataset)
+    {
+        try
+        {
+            var request = await _client.Datasets.TakeOverInGroupWithHttpMessagesAsync(workspace.Id, dataset.Id);
+            await Console.Out.WriteLineAsync(request.Response.StatusCode.ToString());
+            return true;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Failed to take ower dataset {dataset.Name}. {ex.Message}");
         }
     }
 }
